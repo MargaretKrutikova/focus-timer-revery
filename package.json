@@ -1,34 +1,28 @@
 {
-  "name": "revery-quick-start",
+  "name": "focus-timer-revery",
   "version": "1.3.0",
-  "description": "Revery quickstart",
+  "description": "Focus timer desktop app in revery",
   "license": "MIT",
   "esy": {
     "build": "refmterr dune build -p App",
     "buildsInSource": "_build",
-    "install": [
-      "esy-installer App.install"
-    ]
+    "install": [ "esy-installer App.install" ]
   },
   "revery-packager": {
-    "bundleName": "ExampleApp",
-    "bundleId": "com.example.app",
-    "displayName": "Revery Example App",
+    "bundleName": "FocusTimer",
+    "bundleId": "com.focus-timer.app",
+    "displayName": "Focus Timer App",
     "mainExecutable": "App",
-    "windows": {
-      "packages": ["zip"],
-      "iconFile": "assets/icon.ico"
-    },
+    "windows": { "packages": [ "zip" ], "iconFile": "assets/icon.ico" },
     "darwin": {
-      "packages": ["tar", "dmg"],
+      "packages": [ "tar", "dmg" ],
       "iconFile": "assets/icon.icns"
     },
-    "linux": {
-      "packages": ["tar", "appimage"]
-    }
+    "linux": { "packages": [ "tar", "appimage" ] }
   },
   "dependencies": {
     "ocaml": "~4.7.0",
+    "reason-sdl2": "^2.10.3011",
     "revery": "0.29.0"
   },
   "resolutions": {
@@ -38,9 +32,8 @@
     "@opam/merlin-extend": "0.4"
   },
   "scripts": {
-   "format": "bash -c \"refmt --in-place *.re\"",
-   "run": "esy x App"
-
+    "format": "bash -c \"refmt --in-place *.re\"",
+    "run": "esy x App"
   },
   "devDependencies": {
     "ocaml": "~4.7.0",
