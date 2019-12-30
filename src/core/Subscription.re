@@ -6,13 +6,27 @@ type source('a) = {
   value: 'a,
 };
 
+type action('a) =
+  | StateUpdated(source('a))
+  | ValueUpdated('a);
+
+let reducer = (action, state) => {
+  switch (action) {
+  | StateUpdated(s) => s
+  | ValueUpdated(value) => state.value !== value ? {...state, value} : state
+  };
+};
+
 let useSubscription =
     (subscribe: (unit => unit, unit) => unit, getCurrentValue: unit => 'a) => {
   let hasSubscriptionChanged = prevState =>
     prevState.getCurrentValue !== getCurrentValue;
 
-  let%hook (state, setState) =
-    Hooks.state({getCurrentValue, value: getCurrentValue()});
+  let%hook (state, dispatch) =
+    Hooks.reducer(
+      ~initialState={getCurrentValue, value: getCurrentValue()},
+      reducer,
+    );
 
   let%hook () =
     Hooks.effect(
@@ -20,16 +34,10 @@ let useSubscription =
       () => {
         let didUnsubscribe = ref(false);
 
-        let updateState = () =>
-          setState(prevState =>
-            if (hasSubscriptionChanged(prevState)) {
-              prevState;
-            } else {
-              let newValue = getCurrentValue();
-              prevState.value === newValue
-                ? prevState : {...prevState, value: newValue};
-            }
-          );
+        let updateState = () => {
+          let newValue = getCurrentValue();
+          dispatch(ValueUpdated(newValue));
+        };
 
         let checkForUpdates = () =>
           if (! didUnsubscribe^) {
@@ -38,10 +46,7 @@ let useSubscription =
 
         // state value might have changed between unscribing and subscribing again due
         // to a new selector function (e.g. because of a change in props used inside of it).
-        let newValue = getCurrentValue();
-        if (state.value !== newValue) {
-          setState(prevState => {...prevState, value: newValue});
-        };
+        updateState();
 
         let unsubscribe = subscribe(checkForUpdates);
 
@@ -57,7 +62,7 @@ let useSubscription =
   // evaluate the return value
   if (hasSubscriptionChanged(state)) {
     let newValue = getCurrentValue();
-    setState(_ => {getCurrentValue, value: newValue});
+    dispatch(StateUpdated({getCurrentValue, value: newValue}));
 
     newValue;
   } else {
