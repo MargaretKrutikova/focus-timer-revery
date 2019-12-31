@@ -14,3 +14,16 @@ let run = (effect: t('action), dispatch: dispatch('action)) => {
   | Some(effect) => effect.fn(dispatch)
   };
 };
+
+let batch = (effects: list(t('a))) => {
+  let effects = effects |> List.filter(e => e != None);
+
+  let execute = dispatch => {
+    List.iter(e => run(e, dispatch), effects);
+  };
+
+  switch (effects) {
+  | [] => None
+  | _ => Some({fn: execute})
+  };
+};

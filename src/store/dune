@@ -1,0 +1,4 @@
+(library
+    (name FocusTimer_Store)
+    (public_name FocusTimer.Store)
+    (libraries Revery FocusTimer_Core FocusTimer_Utils))

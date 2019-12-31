@@ -1,4 +1,6 @@
 open Revery
+open FocusTimer_Core
+open FocusTimer_Utils
 
 type dispose = unit -> unit
 type clock = unit -> float
@@ -56,9 +58,17 @@ module Effects = struct
     Effect.create (fun dispatch ->
       let dispose = Tick.interval
           (fun t -> Tick(t |> Time.toFloatSeconds) |> dispatch)
-          Time.zero
+          (Time.ofFloatSeconds 0.2)
       in
       TimerStarted dispose |> dispatch
+    )
+
+  let playTimerElapseSound settings timer =
+    Effect.create (fun _ -> 
+      timer 
+      |> Settings.getTimerElapseSound settings 
+      |> Audio.playSound 
+      |> ignore
     )
 end
 
@@ -69,12 +79,16 @@ let pauseTimer (clock: clock) timer (tr: timerRunningData) : (state * action Eff
   TimerPausedState ({ started = tr.started; elapsed=tr.elapsed; paused = clock() } |> timerWithData timer),
   Effects.pauseTimer tr.dispose
 
-let nextTick duration clock timer (tr: timerRunningData) tick : (state * action Effect.t) =
+let nextTick settings timer (tr: timerRunningData) tick : (state * action Effect.t) =
   let elapsed = tr.elapsed +. tick in
-  if elapsed > duration
+  if elapsed > Settings.getDuration settings timer
   then 
     TimerElapsedState {timer;data=()},
-    Effect.batch [Effects.stopTimer tr.dispose; Effects.startTimer ()]
+    Effect.batch [
+      Effects.playTimerElapseSound settings timer; 
+      Effects.stopTimer tr.dispose; 
+      Effects.startTimer ()
+    ]
   else 
     TimerRunningState ({ tr with elapsed=elapsed} |> timerWithData timer), 
     Effect.none
@@ -86,6 +100,14 @@ let toElapsed =
 
 module StateMachine = struct
     let run ~settings ~clock:(clock:clock) state action : (state * action Effect.t) = 
+      (* let x = match state with
+      | TimerElapsedState _ -> Printf.printf "%s" "TIMER: Elapsed\n"
+      | TimerRunningState {timer;data} -> Printf.printf "%s" ("TIMER: Running at " ^ (data.elapsed |> string_of_float) ^ " \n")
+      | TimerScheduled _ -> Printf.printf "TIMER: Sceduled\n"
+      | TimerPausedState _ -> Printf.printf "TIMER: Paused\n"
+      | Idle _ ->  Printf.printf "TIMER: Idle\n"
+      in *)
+
       match action with
       | StartTimers -> 
       (match state with
@@ -94,7 +116,7 @@ module StateMachine = struct
       | Tick tick -> 
         (match state with 
         | TimerRunningState {timer;data} -> 
-          nextTick (Settings.getDuration settings timer) clock timer data tick
+          nextTick settings timer data tick
         | _ -> (state, Effect.none))
       | TimerStarted dispose -> 
         (match state with
@@ -104,7 +126,7 @@ module StateMachine = struct
         | _ -> (state, Effect.none))
       | TimerElapsed ->
          (match state with
-          | TimerElapsedState {timer;data} -> TimerModel.next timer |> scheduleTimer NewTimer
+          | TimerElapsedState {timer;_} -> TimerModel.next timer |> scheduleTimer NewTimer
           | _ -> (state, Effect.none))
       | TimerResumed ->
         (match state with 

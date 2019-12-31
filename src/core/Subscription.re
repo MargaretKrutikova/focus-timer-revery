@@ -1,4 +1,3 @@
-open Revery;
 open Revery.UI;
 
 type source('a) = {

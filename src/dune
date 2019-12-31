@@ -1,16 +1,24 @@
-(dirs :standard \ sdl-audio)
-(include_subdirs unqualified)
-
-(executable
-    (name App)
-    (package App)
+(library
+    (name FocusTimer)
+    (public_name FocusTimer.lib)
     (preprocess (pps brisk-reconciler.ppx))
     (flags (-w +26))
-    (public_name App)
-    (libraries
+    (libraries 
         bigarray
         SdlAudio
         threads.posix
         sdl2
-        Revery))
-        
+        FocusTimer_Utils
+        FocusTimer_Core
+        FocusTimer_Store
+        FocusTimer_Components
+        Revery)
+    (modules (:standard \ App )))
+
+(executable
+    (package FocusTimer)
+    (name App)
+    (public_name App.exe)
+    (libraries FocusTimer.lib)
+    (modules App)
+)

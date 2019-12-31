@@ -1,0 +1,5 @@
+(library
+    (name FocusTimer_Core)
+    (public_name FocusTimer.Core)
+    (preprocess (pps brisk-reconciler.ppx))
+    (libraries Revery))

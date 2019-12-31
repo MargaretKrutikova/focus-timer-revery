@@ -1,6 +1,4 @@
-open CoreTypes;
 open Revery.UI;
-open Revery;
 
 type updater('action, 'state) =
   ('state, 'action) => ('state, Effect.t('action));
