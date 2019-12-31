@@ -8,6 +8,9 @@
     "dependencies": {
       "@reason-native/rely": "*"
     },
-    "install": ["esy-installer App.install", "esy-installer AppTest.install"]
+    "install": [
+      "esy-installer FocusTimer.install",
+      "esy-installer FocusTimerTest.install"
+    ]
   }
 }

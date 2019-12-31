@@ -1,7 +1,9 @@
 open TestFramework;
+open FocusTimer_Utils;
 
-describe("my first test suite", ({test}) => {
-  test("1 + 1 should equal 2", ({expect}) => {
-    expect.int(1 + 1).toBe(2)
+describe("Time interval utils", ({test}) => {
+  test("formats time correctly", ({expect}) => {
+    let time: TimeInterval.t = {hour: 0, min: 0, sec: 10};
+    expect.string(TimeInterval.format(time)).toEqual("0:10");
   })
 });

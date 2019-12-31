@@ -70,3 +70,4 @@ _release/
 *.install
 .merlin
 
+.DS_STORE

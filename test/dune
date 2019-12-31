@@ -1,17 +1,18 @@
 (library
-   (name AppTest)
-   (public_name AppTest.lib)
+   (name FocusTimerTest)
+   (public_name FocusTimerTest.lib)
    (ocamlopt_flags -linkall -g)
    (flags -w -26)
-   (libraries rely.lib )
-   (modules (:standard \ RunTests))
+   (libraries rely.lib FocusTimer.lib)
+   (modules (:standard \ RunTests ))
 )
+
 (executable
-  (package AppTest)
+  (package FocusTimerTest)
   (name RunTests)
   (public_name RunTests.exe)
   (libraries
-    AppTest.lib
+    FocusTimerTest.lib
   )
   (modules RunTests)
 )

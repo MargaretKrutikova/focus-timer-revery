@@ -1,1 +1,1 @@
-AppTest.TestFramework.cli();
+FocusTimerTest.TestFramework.cli();
