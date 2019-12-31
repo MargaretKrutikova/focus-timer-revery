@@ -1,4 +1,5 @@
 (library
   (name SdlAudio)
   (c_names audio)
-  (c_flags :standard -Wall -Wextra -Werror -I%{env:SDL2_INCLUDE_PATH=default}))
+  (c_flags :standard -Wall -Wextra -Werror -I%{env:SDL2_INCLUDE_PATH=default})
+  )

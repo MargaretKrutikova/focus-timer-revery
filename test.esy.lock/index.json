@@ -1,5 +1,5 @@
 {
-  "checksum": "d2b6e97a7fc77c892841a78f67c8f366",
+  "checksum": "992a840885e8e413436710be95328340",
   "root": "focus-timer-revery@link-dev:./package.json",
   "node": {
     "revery@0.29.0@d41d8cd9": {
@@ -212,23 +212,6 @@
       "dependencies": [],
       "devDependencies": []
     },
-    "isolinear@2.2.0@d41d8cd9": {
-      "id": "isolinear@2.2.0@d41d8cd9",
-      "name": "isolinear",
-      "version": "2.2.0",
-      "source": {
-        "type": "install",
-        "source": [
-          "archive:https://registry.npmjs.org/isolinear/-/isolinear-2.2.0.tgz#sha1:a490bbb35a9e5e58f29973386b16912e828a5130"
-        ]
-      },
-      "overrides": [],
-      "dependencies": [
-        "refmterr@3.3.0@d41d8cd9", "ocaml@4.7.1004@d41d8cd9",
-        "@opam/dune@opam:1.11.4@a7ccb7ae", "@esy-ocaml/reason@3.5.2@d41d8cd9"
-      ],
-      "devDependencies": []
-    },
     "focus-timer-revery@link-dev:./package.json": {
       "id": "focus-timer-revery@link-dev:./package.json",
       "name": "focus-timer-revery",
@@ -241,8 +224,7 @@
       "overrides": [ "test.json" ],
       "dependencies": [
         "revery@0.29.0@d41d8cd9", "reason-sdl2@2.10.3012@d41d8cd9",
-        "ocaml@4.7.1004@d41d8cd9", "isolinear@2.2.0@d41d8cd9",
-        "@reason-native/rely@3.1.0@d41d8cd9"
+        "ocaml@4.7.1004@d41d8cd9", "@reason-native/rely@3.1.0@d41d8cd9"
       ],
       "devDependencies": [
         "ocaml@4.7.1004@d41d8cd9", "esy-macdylibbundler@0.4.5@d41d8cd9",

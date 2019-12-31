@@ -1,7 +1,11 @@
+(dirs :standard \ sdl-audio)
+(include_subdirs unqualified)
+
 (executable
     (name App)
     (package App)
     (preprocess (pps brisk-reconciler.ppx))
+    (flags (-w +26))
     (public_name App)
     (libraries
         bigarray
