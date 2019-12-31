@@ -4,21 +4,36 @@
   "description": "Focus timer desktop app in revery",
   "license": "MIT",
   "esy": {
-    "build": "refmterr dune build -p App",
+    "build": "refmterr dune build -p FocusTimer",
     "buildsInSource": "_build",
-    "install": [ "esy-installer App.install" ]
+    "install": [
+      "esy-installer FocusTimer.install"
+    ]
   },
   "revery-packager": {
     "bundleName": "FocusTimer",
     "bundleId": "com.focus-timer.app",
     "displayName": "Focus Timer App",
     "mainExecutable": "App",
-    "windows": { "packages": [ "zip" ], "iconFile": "assets/icon.ico" },
+    "windows": {
+      "packages": [
+        "zip"
+      ],
+      "iconFile": "assets/icon.ico"
+    },
     "darwin": {
-      "packages": [ "tar", "dmg" ],
+      "packages": [
+        "tar",
+        "dmg"
+      ],
       "iconFile": "assets/icon.icns"
     },
-    "linux": { "packages": [ "tar", "appimage" ] }
+    "linux": {
+      "packages": [
+        "tar",
+        "appimage"
+      ]
+    }
   },
   "dependencies": {
     "@reason-native/rely": "^3.1.0",
@@ -34,7 +49,7 @@
   },
   "scripts": {
     "format": "bash -c \"refmt --in-place *.re\"",
-    "run": "esy x App",
+    "run": "esy x App.exe",
     "test": "esy b dune runtest"
   },
   "devDependencies": {
