@@ -1,0 +1,17 @@
+(library
+   (name AppTest)
+   (public_name AppTest.lib)
+   (ocamlopt_flags -linkall -g)
+   (flags -w -26)
+   (libraries rely.lib )
+   (modules (:standard \ RunTests))
+)
+(executable
+  (package AppTest)
+  (name RunTests)
+  (public_name RunTests.exe)
+  (libraries
+    AppTest.lib
+  )
+  (modules RunTests)
+)

@@ -1,0 +1,13 @@
+{
+  "source": "./package.json",
+  "scripts": {
+    "run": "esy '@test' x RunTests.exe"
+  },
+  "override": {
+    "build": ["dune build . -j4"],
+    "dependencies": {
+      "@reason-native/rely": "*"
+    },
+    "install": ["esy-installer App.install", "esy-installer AppTest.install"]
+  }
+}

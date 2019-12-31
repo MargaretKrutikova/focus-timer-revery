@@ -21,6 +21,7 @@
     "linux": { "packages": [ "tar", "appimage" ] }
   },
   "dependencies": {
+    "@reason-native/rely": "^3.1.0",
     "ocaml": "~4.7.0",
     "reason-sdl2": "^2.10.3011",
     "revery": "0.29.0"
@@ -33,7 +34,8 @@
   },
   "scripts": {
     "format": "bash -c \"refmt --in-place *.re\"",
-    "run": "esy x App"
+    "run": "esy x App",
+    "test": "esy b dune runtest"
   },
   "devDependencies": {
     "ocaml": "~4.7.0",
