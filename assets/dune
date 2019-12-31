@@ -1,4 +1,4 @@
 (install
     (section bin)
-    (package App)
-    (files Roboto-Regular.ttf))
+    (package FocusTimer)
+    (files drum.wav Roboto-Regular.ttf))
