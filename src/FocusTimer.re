@@ -2,10 +2,25 @@ open Revery;
 open Revery.UI;
 open FocusTimer_Components;
 open FocusTimer_Store;
+open FocusTimer_Utils;
 
 module EffectProvider = {
   let%component make = (~children, ()) => {
     let%hook () = AppStore.useRunEffects();
+    children;
+  };
+};
+
+module AudioProvider = {
+  let%component make = (~children, ()) => {
+    let%hook () =
+      Hooks.effect(
+        OnMount,
+        () => {
+          Audio.initSound();
+          Some(Audio.endSound);
+        },
+      );
     children;
   };
 };
@@ -28,7 +43,9 @@ let init = app => {
 
   let element =
     <View style=containerStyle>
-       <EffectProvider><Timer /></EffectProvider>
+      <EffectProvider>
+        <AudioProvider> <Timer /> </AudioProvider>
+      </EffectProvider>
     </View>;
 
   let _ = UI.start(win, element);

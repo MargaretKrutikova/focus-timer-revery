@@ -1,6 +1,6 @@
 (library
   (name SdlAudio)
   (public_name FocusTimer.SdlAudio)
-  (c_names audio)
+  (c_names audio sdl2-audio-caml simple-sdl2-audio)
   (c_flags :standard -Wall -Wextra -Werror -I%{env:SDL2_INCLUDE_PATH=default})
   )
