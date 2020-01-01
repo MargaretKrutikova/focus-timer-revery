@@ -18,7 +18,7 @@
 (executable
     (package FocusTimer)
     (name App)
-    (public_name App.exe)
+    (public_name App)
     (libraries FocusTimer.lib)
     (modules App)
 )

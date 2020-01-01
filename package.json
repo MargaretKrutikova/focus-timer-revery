@@ -49,7 +49,7 @@
   },
   "scripts": {
     "format": "bash -c \"refmt --in-place *.re\"",
-    "run": "esy x App.exe",
+    "run": "esy x App",
     "test": "esy b dune runtest"
   },
   "devDependencies": {
