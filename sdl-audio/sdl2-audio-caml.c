@@ -38,9 +38,12 @@ CAMLprim value SDL_playSoundCAML(value name, value volumeScale) {
   CAMLparam2(name, volumeScale);
 
   const char *filename = String_val(name);
+
+  // the max sound is horribly loud, so adjust it by half
+  double volume = (SDL_MIX_MAXVOLUME * Double_val(volumeScale)) / 2;
   caml_release_runtime_system();
 
-  playSound(filename, SDL_MIX_MAXVOLUME * Double_val(volumeScale));
+  playSound(filename, volume);
 
   caml_acquire_runtime_system();
 

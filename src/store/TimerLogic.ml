@@ -68,7 +68,7 @@ module Effects = struct
       timer 
       |> Settings.getTimerElapseSound settings 
       (* TODO: Implement adjusting sound in the app *)
-      |> Audio.playSound 0.2
+      |> Audio.playSound 0.5
       |> ignore
     )
 end
