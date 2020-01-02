@@ -1,0 +1,4 @@
+(library
+    (name FocusTimer_Models)
+    (public_name FocusTimer.Models)
+)

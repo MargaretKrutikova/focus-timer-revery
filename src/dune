@@ -12,6 +12,7 @@
         FocusTimer_Core
         FocusTimer_Store
         FocusTimer_Components
+        FocusTimer_Models
         Revery)
     (modules (:standard \ App )))
 
