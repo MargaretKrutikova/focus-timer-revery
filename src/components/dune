@@ -2,4 +2,4 @@
     (name FocusTimer_Components)
     (public_name FocusTimer.Components)
     (preprocess (pps brisk-reconciler.ppx))
-    (libraries Revery FocusTimer_Utils FocusTimer_Store))
+    (libraries Revery FocusTimer_Models FocusTimer_Utils FocusTimer_Store))

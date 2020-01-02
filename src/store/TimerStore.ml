@@ -1,6 +1,7 @@
 open Revery
 open FocusTimer_Core
 open FocusTimer_Utils
+open FocusTimer_Models
 
 type dispose = unit -> unit
 type clock = unit -> float
@@ -101,14 +102,6 @@ let toElapsed =
 
 module StateMachine = struct
     let run ~settings ~clock:(clock:clock) state action : (state * action Effect.t) = 
-      (* let x = match state with
-      | TimerElapsedState _ -> Printf.printf "%s" "TIMER: Elapsed\n"
-      | TimerRunningState {timer;data} -> Printf.printf "%s" ("TIMER: Running at " ^ (data.elapsed |> string_of_float) ^ " \n")
-      | TimerScheduled _ -> Printf.printf "TIMER: Sceduled\n"
-      | TimerPausedState _ -> Printf.printf "TIMER: Paused\n"
-      | Idle _ ->  Printf.printf "TIMER: Idle\n"
-      in *)
-
       match action with
       | StartTimers -> 
       (match state with

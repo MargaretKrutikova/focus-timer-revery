@@ -1,6 +1,6 @@
 open Revery;
 open Revery.UI;
-open FocusTimer_Utils;
+open FocusTimer_Models;
 
 module Interval = {
   let make = (~time: Time.t, ()) => {

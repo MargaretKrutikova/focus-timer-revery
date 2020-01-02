@@ -1,8 +1,9 @@
 open FocusTimer_Core;
+open FocusTimer_Models;
 
 let clock = Unix.gettimeofday;
 
-// temporary
+/* temporary */
 let settings: Settings.t = {
   focusDurationSec: 10.0,
   restDurationSec: 10.0,
@@ -11,16 +12,16 @@ let settings: Settings.t = {
   restTimerElapseSoundPath: "drum.wav",
 };
 
-let timerUpdater = TimerLogic.StateMachine.run(~settings, ~clock);
+let timerUpdater = TimerStore.StateMachine.run(~settings, ~clock);
 
 include Core.Make({
-  type action = TimerLogic.action;
-  type state = TimerLogic.state;
+  type action = TimerStore.action;
+  type state = TimerStore.state;
 
   let updater = timerUpdater;
 
   let initialState = (
-    TimerLogic.initialState(settings.defaultTimer),
+    TimerStore.initialState(settings.defaultTimer),
     Effect.none,
   );
 });

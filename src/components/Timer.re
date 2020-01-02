@@ -1,6 +1,7 @@
 open Revery;
 open Revery.UI;
 open FocusTimer_Store;
+open FocusTimer_Models;
 
 type uiTimer = {
   timer: TimerModel.t,
@@ -11,7 +12,7 @@ let fullTime = timer => Settings.getDuration(AppStore.settings, timer);
 let getTimeLeft = (timer, elapsed) =>
   fullTime(timer) -. elapsed |> Time.ofFloatSeconds;
 
-let toUiTimer = (state: TimerLogic.state): uiTimer => {
+let toUiTimer = (state: TimerStore.state): uiTimer => {
   switch (state) {
   | TimerRunningState({timer, data}) => {
       timer,
@@ -39,16 +40,16 @@ let%component make = () => {
   <View>
     <AppButton
       label="Start"
-      onClick={_ => timerDispatch(TimerLogic.StartTimers)}
+      onClick={_ => timerDispatch(TimerStore.StartTimers)}
     />
     <Clock.Interval time={uiTimer.timeLeft} />
     <AppButton
       label="Pause"
-      onClick={_ => timerDispatch(TimerLogic.TimerPaused)}
+      onClick={_ => timerDispatch(TimerStore.TimerPaused)}
     />
     <AppButton
       label="Resume"
-      onClick={_ => timerDispatch(TimerLogic.TimerResumed)}
+      onClick={_ => timerDispatch(TimerStore.TimerResumed)}
     />
   </View>;
 };
