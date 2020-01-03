@@ -6,34 +6,44 @@ open FocusTimer_Models
 type dispose = unit -> unit
 type clock = unit -> float
 
-type 'data timerData = {
-  timer: TimerModel.t;
-  data: 'data;
-}
+module TimerRunningData = struct
+  type t = { dispose: dispose; started: float; elapsed: float; timer: TimerModel.t }
 
-let timerWithData timer data =
-  { timer; data }
+  let make ~started ~elapsed ~dispose timer = {started;elapsed;dispose;timer}
+  let setElapsed elapsed data = { data with elapsed=elapsed}
+end
 
-type timerRunningData =
-    { dispose: dispose;
-      started: float;
-      elapsed: float; }
+module TimerPausedData = struct
+  type t = { started: float; elapsed: float; paused: float; timer: TimerModel.t }
 
-type timerPausedData =
-    { started: float;
-      elapsed: float;
-      paused: float; }
+  let make ~started ~elapsed ~paused timer = {started;elapsed;paused;timer}
+end
 
-type timerScheduledData = NewTimer | ResumedTimer of float
+module TimerScheduledData = struct
+  type type_ = NewTimer | ResumedTimer of float
+  type t = { timer: TimerModel.t; type_: type_ }
 
-type timerElapsedData = ()
+  let make type_ timer = {timer; type_}
+  let toElapsed ts =
+    match ts.type_ with
+    | NewTimer -> 0.0
+    | ResumedTimer elapsed ->  elapsed
+end
+
+module TimerElapsedData = struct
+  type t = {timer: TimerModel.t}
+  let make timer = {timer}
+end
 
 type state =
     | Idle of TimerModel.t
-    | TimerRunningState of timerRunningData timerData
-    | TimerScheduled of timerScheduledData timerData
-    | TimerElapsedState of timerElapsedData timerData
-    | TimerPausedState of timerPausedData timerData
+    | TimerRunningState of TimerRunningData.t
+    | TimerScheduledState of TimerScheduledData.t
+    | TimerElapsedState of TimerElapsedData.t
+    | TimerPausedState of TimerPausedData.t
+
+let isStateEqual expect actual =
+  compare expect actual == 0
 
 let initialState timer = Idle timer
 
@@ -48,14 +58,14 @@ type action =
 
 module Effects = struct
   let stopTimer (dispose: dispose) =
-    Effect.create (fun dispatch -> 
+    Effect.create (fun dispatch ->
       dispatch TimerElapsed;
       dispose())
 
   let pauseTimer (dispose: dispose) =
     Effect.create (fun _ -> dispose())
 
-  let startTimer () = 
+  let startTimer () =
     Effect.create (fun dispatch ->
       let dispose = Tick.interval
           (fun t -> Tick(t |> Time.toFloatSeconds) |> dispatch)
@@ -65,9 +75,9 @@ module Effects = struct
     )
 
   let playTimerElapseSound settings timer =
-    Effect.create (fun _ -> 
-      timer 
-      |> Settings.getTimerElapseSound settings 
+    Effect.create (fun _ ->
+      timer
+      |> Settings.getTimerElapseSound settings
       (* TODO: Implement adjusting sound in the app *)
       |> Audio.playSound 0.5
       |> ignore
@@ -75,60 +85,57 @@ module Effects = struct
 end
 
 let scheduleTimer type_ timer : (state * action Effect.t) =
-  TimerScheduled (type_ |> timerWithData timer), Effects.startTimer ()
+  TimerScheduledState (TimerScheduledData.make type_ timer), Effects.startTimer ()
 
-let pauseTimer (clock: clock) timer (tr: timerRunningData) : (state * action Effect.t)  =
-  TimerPausedState ({ started = tr.started; elapsed=tr.elapsed; paused = clock() } |> timerWithData timer),
+let pauseTimer (clock: clock) (tr: TimerRunningData.t) : (state * action Effect.t) =
+  TimerPausedState (TimerPausedData.make ~started:tr.started ~elapsed:tr.elapsed ~paused: (clock ()) tr.timer),
   Effects.pauseTimer tr.dispose
 
-let nextTick settings timer (tr: timerRunningData) tick : (state * action Effect.t) =
+let startTimer clock dispose (ts: TimerScheduledData.t) =
+  let elapsed = TimerScheduledData.toElapsed ts in
+  let trd = TimerRunningData.make ~started:(clock ()) ~elapsed ~dispose ts.timer in
+  (TimerRunningState trd, Effect.none)
+
+let nextTick settings (tr: TimerRunningData.t) tick : (state * action Effect.t) =
   let elapsed = tr.elapsed +. tick in
-  if elapsed > Settings.getDuration settings timer
-  then 
-    TimerElapsedState {timer;data=()},
+  if elapsed > Settings.getDuration settings tr.timer
+  then
+    TimerElapsedState (TimerElapsedData.make tr.timer),
     Effect.batch [
-      Effects.playTimerElapseSound settings timer; 
-      Effects.stopTimer tr.dispose; 
+      Effects.playTimerElapseSound settings tr.timer;
+      Effects.stopTimer tr.dispose;
       Effects.startTimer ()
     ]
-  else 
-    TimerRunningState ({ tr with elapsed=elapsed} |> timerWithData timer), 
+  else
+    TimerRunningState (TimerRunningData.setElapsed elapsed tr),
     Effect.none
 
-let toElapsed =
-  function
-  | NewTimer -> 0.0
-  | ResumedTimer elapsed ->  elapsed 
-
 module StateMachine = struct
-    let run ~settings ~clock:(clock:clock) state action : (state * action Effect.t) = 
+    let run ~settings ~clock:(clock:clock) state action : (state * action Effect.t) =
       match action with
-      | StartTimers -> 
+      | StartTimers ->
       (match state with
         | Idle defaultTimer -> scheduleTimer NewTimer defaultTimer
         | _ -> (state, Effect.none))
-      | Tick tick -> 
-        (match state with 
-        | TimerRunningState {timer;data} -> 
-          nextTick settings timer data tick
-        | _ -> (state, Effect.none))
-      | TimerStarted dispose -> 
+      | Tick tick ->
         (match state with
-        | TimerScheduled {timer;data} ->
-          let trd = {started=clock (); elapsed=toElapsed data; dispose} |> timerWithData timer in
-          (TimerRunningState trd, Effect.none)
+        | TimerRunningState tr -> nextTick settings tr tick
+        | _ -> (state, Effect.none))
+      | TimerStarted dispose ->
+        (match state with
+        | TimerScheduledState ts -> startTimer clock dispose ts
         | _ -> (state, Effect.none))
       | TimerElapsed ->
          (match state with
-          | TimerElapsedState {timer;_} -> TimerModel.next timer |> scheduleTimer NewTimer
+          | TimerElapsedState te -> TimerModel.next te.timer |> scheduleTimer NewTimer
           | _ -> (state, Effect.none))
       | TimerResumed ->
-        (match state with 
-        | TimerPausedState {timer;data} -> scheduleTimer (ResumedTimer data.elapsed) timer
+        (match state with
+        | TimerPausedState tp -> scheduleTimer (ResumedTimer tp.elapsed) tp.timer
         | _ -> (state, Effect.none))
-      | TimerPaused -> 
-        (match state with 
-        | TimerRunningState {timer;data} -> pauseTimer clock timer data
+      | TimerPaused ->
+        (match state with
+        | TimerRunningState tr -> pauseTimer clock tr
         | _ -> (state, Effect.none))
       | TimerStopped -> Idle settings.defaultTimer, Effect.none
   end
