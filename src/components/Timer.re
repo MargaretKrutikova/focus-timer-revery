@@ -14,18 +14,18 @@ let getTimeLeft = (timer, elapsed) =>
 
 let toUiTimer = (state: TimerStore.state): uiTimer => {
   switch (state) {
-  | TimerRunningState({timer, elapsed}) => {
+  | TimerRunningState({timer, elapsed, _}) => {
       timer,
       timeLeft: getTimeLeft(timer, elapsed),
     }
-  | TimerScheduledState({timer} as ts) =>
+  | TimerScheduledState({timer, _} as ts) =>
     let elapsed = TimerStore.TimerScheduledData.toElapsed(ts);
     {timer, timeLeft: getTimeLeft(timer, elapsed)};
   | TimerElapsedState({timer, _}) => {
       timer,
       timeLeft: fullTime(timer) |> Time.ofFloatSeconds,
     }
-  | TimerPausedState({timer, elapsed}) => {
+  | TimerPausedState({timer, elapsed, _}) => {
       timer,
       timeLeft: getTimeLeft(timer, elapsed),
     }

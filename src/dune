@@ -2,8 +2,8 @@
     (name FocusTimer)
     (public_name FocusTimer.lib)
     (preprocess (pps brisk-reconciler.ppx))
-    (flags (-w +26))
-    (libraries 
+    (flags (-w +26 -w -9))
+    (libraries
         bigarray
         SdlAudio
         threads.posix

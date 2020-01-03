@@ -1,5 +1,5 @@
 open TestFramework;
-open FocusTimer_Utils;
+open FocusTimer_Models;
 
 describe("Time interval utils", ({test}) => {
   test("formats time correctly", ({expect}) => {

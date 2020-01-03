@@ -2,7 +2,7 @@
    (name FocusTimerTest)
    (public_name FocusTimerTest.lib)
    (ocamlopt_flags -linkall -g)
-   (flags -w -26)
+   (flags -w -26 -w -9)
    (libraries rely.lib FocusTimer.lib)
    (modules (:standard \ RunTests ))
 )
