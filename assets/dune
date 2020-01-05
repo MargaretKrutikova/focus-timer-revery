@@ -1,4 +1,4 @@
 (install
     (section bin)
     (package FocusTimer)
-    (files drum.wav Raleway-Regular.ttf))
+    (files drum.wav Montserrat-Regular.ttf))

@@ -91,5 +91,5 @@ let textStyle variant : Style.textStyleProps list=
 
 let fontFamily ?weight:(w=`Regular) () = 
   match w with
-  | `Regular -> "Raleway-Regular.ttf"
+  | `Regular -> "Montserrat-Regular.ttf"
 

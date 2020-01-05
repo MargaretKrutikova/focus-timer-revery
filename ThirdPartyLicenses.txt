@@ -2,14 +2,11 @@ THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
 
 This project incorporates components from the projects listed below. The original copyright notices and the licenses under which Outrun Labs, LLC received such components are set forth below. Outrun Labs, LLC reserves all rights not expressly granted herein, whether by implication, estoppel or otherwise.
 
-1. Raleway Font 
+1. Montserrat Font 
 
-%% Roboto NOTICES AND INFORMATION BEGIN HERE
+%% Montserrat NOTICES AND INFORMATION BEGIN HERE
 ==============================================
-
-                               Copyright (c) 2010, Matt McInerney (matt@pixelspread.com),
-Copyright (c) 2011, Pablo Impallari (www.impallari.com|impallari@gmail.com),
-Copyright (c) 2011, Rodrigo Fuenzalida (www.rfuenzalida.com|hello@rfuenzalida.com), with Reserved Font Name Raleway
+Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
@@ -104,7 +101,7 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 
 ==============================================
-END of Roboto NOTICES AND INFORMATION
+END of Montserrat NOTICES AND INFORMATION
 
 2. Simple SDL2 Audio (https://github.com/jakebesworth/Simple-SDL2-Audio)
 
