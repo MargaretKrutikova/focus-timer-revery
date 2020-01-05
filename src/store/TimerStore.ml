@@ -2,64 +2,12 @@ open Revery
 open FocusTimer_Core
 open FocusTimer_Utils
 open FocusTimer_Models
-
-type dispose = unit -> unit
-type clock = unit -> float
-
-module TimerRunningData = struct
-  type t = { dispose: dispose; started: float; elapsed: float; timer: TimerModel.t }
-
-  let make ~started ~elapsed ~dispose timer = {started;elapsed;dispose;timer}
-  let setElapsed elapsed data = { data with elapsed=elapsed}
-end
-
-module TimerPausedData = struct
-  type t = { started: float; elapsed: float; paused: float; timer: TimerModel.t }
-
-  let make ~started ~elapsed ~paused timer = {started;elapsed;paused;timer}
-end
-
-module TimerScheduledData = struct
-  type type_ = NewTimer | ResumedTimer of float
-  type t = { timer: TimerModel.t; type_: type_ }
-
-  let make type_ timer = {timer; type_}
-  let toElapsed ts =
-    match ts.type_ with
-    | NewTimer -> 0.0
-    | ResumedTimer elapsed ->  elapsed
-end
-
-module TimerElapsedData = struct
-  type t = {timer: TimerModel.t}
-  let make timer = {timer}
-end
-
-type state =
-    | Idle of TimerModel.t
-    | TimerRunningState of TimerRunningData.t
-    | TimerScheduledState of TimerScheduledData.t
-    | TimerElapsedState of TimerElapsedData.t
-    | TimerPausedState of TimerPausedData.t
-
-let isStateEqual expect actual =
-  compare expect actual == 0
-
-let initialState timer = Idle timer
-
-type action =
-    | StartTimers
-    | Tick of float
-    | TimerStarted of dispose
-    | TimerPaused
-    | TimerResumed
-    | TimerElapsed
-    | TimerStopped
+open TimerState
 
 module Effects = struct
   let stopTimer (dispose: dispose) =
     Effect.create (fun dispatch ->
-      dispatch TimerElapsed;
+      dispatch AppActions.TimerElapsed;
       dispose())
 
   let pauseTimer (dispose: dispose) =
@@ -68,10 +16,10 @@ module Effects = struct
   let startTimer () =
     Effect.create (fun dispatch ->
       let dispose = Tick.interval
-          (fun t -> Tick(t |> Time.toFloatSeconds) |> dispatch)
+          (fun t -> AppActions.Tick(t |> Time.toFloatSeconds) |> dispatch)
           (Time.ofFloatSeconds 0.2)
       in
-      TimerStarted dispose |> dispatch
+      AppActions.TimerStarted dispose |> dispatch
     )
 
   let playTimerElapseSound settings timer =
@@ -84,19 +32,19 @@ module Effects = struct
     )
 end
 
-let scheduleTimer type_ timer : (state * action Effect.t) =
+let scheduleTimer type_ timer : (state * AppActions.t Effect.t) =
   TimerScheduledState (TimerScheduledData.make type_ timer), Effects.startTimer ()
 
-let pauseTimer (clock: clock) (tr: TimerRunningData.t) : (state * action Effect.t) =
+let pauseTimer (clock: clock) (tr: TimerRunningData.t) : (state * AppActions.t Effect.t) =
   TimerPausedState (TimerPausedData.make ~started:tr.started ~elapsed:tr.elapsed ~paused: (clock ()) tr.timer),
   Effects.pauseTimer tr.dispose
 
 let startTimer clock dispose (ts: TimerScheduledData.t) =
   let elapsed = TimerScheduledData.toElapsed ts in
-  let trd = TimerRunningData.make ~started:(clock ()) ~elapsed ~dispose ts.timer in
+  let trd = TimerRunningData.make ~started:(clock ()) ~elapsed dispose ts.timer in
   (TimerRunningState trd, Effect.none)
 
-let nextTick settings (tr: TimerRunningData.t) tick : (state * action Effect.t) =
+let nextTick settings (tr: TimerRunningData.t) tick : (state * AppActions.t Effect.t) =
   let elapsed = tr.elapsed +. tick in
   if elapsed > Settings.getDuration settings tr.timer
   then
@@ -111,9 +59,9 @@ let nextTick settings (tr: TimerRunningData.t) tick : (state * action Effect.t) 
     Effect.none
 
 module StateMachine = struct
-    let run ~settings ~clock:(clock:clock) state action : (state * action Effect.t) =
+    let run ~settings ~clock:(clock:clock) state action : (state * AppActions.t Effect.t) =
       match action with
-      | StartTimers ->
+      | AppActions.StartTimers ->
       (match state with
         | Idle defaultTimer -> scheduleTimer NewTimer defaultTimer
         | _ -> (state, Effect.none))

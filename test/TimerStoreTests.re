@@ -2,6 +2,7 @@ open TestFramework;
 open FocusTimer_Store;
 open FocusTimer_Models;
 open TimerStore;
+open TimerState;
 
 let clock: clock = () => 0.0;
 
@@ -20,7 +21,8 @@ describe("Timer store", t => {
     let reducer = StateMachine.run(~settings, ~clock);
     let (state, _) = reducer(initialState, StartTimers);
 
-    let expected = TimerScheduledState(TimerScheduledData.make(NewTimer, defaultTimer));
+    let expected =
+      TimerScheduledState(TimerScheduledData.make(NewTimer, defaultTimer));
     let isExpected = isStateEqual(expected, state);
 
     e.expect.bool(isExpected).toBeTrue();

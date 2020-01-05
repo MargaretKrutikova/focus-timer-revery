@@ -12,16 +12,22 @@ let settings: Settings.t = {
   restTimerElapseSoundPath: "drum.wav",
 };
 
+type appState = {timer: TimerState.state};
+let initialAppState = {
+  timer: TimerState.initialState(settings.defaultTimer),
+};
+
 let timerUpdater = TimerStore.StateMachine.run(~settings, ~clock);
+let appUpdater = (state: appState, action) => {
+  let (timer, effect) = timerUpdater(state.timer, action);
+  let state = {timer: timer};
+  (state, effect);
+};
 
 include Core.Make({
-  type action = TimerStore.action;
-  type state = TimerStore.state;
+  type action = AppActions.t;
+  type state = appState;
 
-  let updater = timerUpdater;
-
-  let initialState = (
-    TimerStore.initialState(settings.defaultTimer),
-    Effect.none,
-  );
+  let updater = appUpdater;
+  let initialState = (initialAppState, Effect.none);
 });
