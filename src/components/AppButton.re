@@ -39,7 +39,7 @@ module Styles = {
       textWrap(TextWrapping.NoWrap),
       fontSize(size),
       lineHeight(line),
-      fontFamily("Roboto-Regular.ttf"),
+      fontFamily(Theme.fontFamily()),
     ];
   };
 };

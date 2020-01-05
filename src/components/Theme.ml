@@ -8,7 +8,7 @@ let baseLineHeight = 1.4
 let headingLineHeight = 1.2
 
 let baseLineGrid = 4
-let fontScale = 1.2
+let fontScale = 1.6
 
 module Colors = struct 
   let darkGreen = hex "#004643"
@@ -88,3 +88,8 @@ let colorFromTimer color timer =
 let textStyle variant : Style.textStyleProps list=
   let size, line = fontVariant variant in
   Style.[fontSize size; lineHeight line] 
+
+let fontFamily ?weight:(w=`Regular) () = 
+  match w with
+  | `Regular -> "Raleway-Regular.ttf"
+

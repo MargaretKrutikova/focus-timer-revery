@@ -1,4 +1,4 @@
 (install
     (section bin)
     (package FocusTimer)
-    (files drum.wav Roboto-Regular.ttf))
+    (files drum.wav Raleway-Regular.ttf))
