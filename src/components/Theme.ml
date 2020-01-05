@@ -8,7 +8,7 @@ let baseLineHeight = 1.4
 let headingLineHeight = 1.2
 
 let baseLineGrid = 4
-let fontScale = 1.6
+let fontScale = 1.5
 
 module Colors = struct 
   let darkGreen = hex "#004643"
