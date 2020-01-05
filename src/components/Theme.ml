@@ -1,5 +1,6 @@
 open Revery.Color
 open Revery.UI
+open FocusTimer_Models
 
 (* base values *)
 let baseFontSize = 20
@@ -8,6 +9,24 @@ let headingLineHeight = 1.2
 
 let baseLineGrid = 4
 let fontScale = 1.2
+
+module Colors = struct 
+  let darkGreen = hex "#004643"
+  let darkerGreen = hex "#0f3433"
+  let lightGreen = hex "#abd1c6"
+
+  let yellow = hex "#f9bc60"
+  let lightYellow = hex "#FBD499"
+  let darkerYellow = hex "#F7A427"
+
+  let pink = hex "#e16162"
+  let lightPink = hex "#F9DFDF"
+  let darkerPink = hex "#6A1515"
+
+  let white = hex "#fffffe"
+  let black = hex "#001e1d"
+  let lightGray = hex "#e8e4e6"
+end
 
 (* utils *)
 let fontSize factor =
@@ -44,8 +63,26 @@ let space = function
   | `custom multiplier -> multiplier * baseLineGrid
 
 let color = function 
-  | `Bg -> rgb 53.0 61.0 74.0
-  | `PrimaryText -> rgb 200.0 200.0 200.0
+  | `Bg -> Colors.lightGreen
+  | `ButtonText -> Colors.black
+  | `Button -> Colors.yellow
+  | `ButtonHover -> Colors.darkerYellow
+  | `ButtonBorder -> Colors.black
+
+type timerColor = [ `Bg | `Text | `Primary ]
+
+let colorFromTimer color timer =
+  match timer with
+  | TimerModel.Focus -> 
+    (match color with
+    | `Bg -> Colors.lightPink
+    | `Text -> Colors.darkerPink
+    | `Primary -> Colors.darkerPink)
+  | TimerModel.Rest -> 
+    (match color with
+    | `Bg -> Colors.lightGreen
+    | `Text -> Colors.darkerGreen
+    | `Primary -> Colors.darkerGreen)
 
 (* styles *)
 let textStyle variant : Style.textStyleProps list=
