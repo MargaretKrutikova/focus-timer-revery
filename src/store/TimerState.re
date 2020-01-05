@@ -68,3 +68,8 @@ let currentTimer =
   | TimerRunningState({timer, _})
   | TimerScheduledState({timer, _})
   | TimerPausedState({timer, _}) => timer;
+
+let isIdle =
+  fun
+  | Idle(_) => true
+  | _ => false;

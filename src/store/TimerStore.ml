@@ -81,5 +81,5 @@ module StateMachine = struct
         (match state with
         | TimerRunningState tr -> pauseTimer clock tr
         | _ -> (state, Effect.none))
-      | TimerStopped -> Idle settings.defaultTimer, Effect.none
+      | TimerSkipped -> Idle settings.defaultTimer, Effect.none
   end
