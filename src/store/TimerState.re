@@ -47,23 +47,24 @@ module TimerScheduledData = {
   let make = (type_, timer) => {timer, type_};
   let toElapsed = data =>
     switch (data.type_) {
-    | NewTimer => 0.0
+    | NewTimer => 0.0001 // simulate already running timer
     | ResumedTimer(elapsed) => elapsed
     };
-};
-
-module TimerElapsedData = {
-  type t = {timer: TimerModel.t};
-  let make = timer => {timer: timer};
 };
 
 type state =
   | Idle(TimerModel.t)
   | TimerRunningState(TimerRunningData.t)
   | TimerScheduledState(TimerScheduledData.t)
-  | TimerElapsedState(TimerElapsedData.t)
   | TimerPausedState(TimerPausedData.t);
 
 let initialState = timer => Idle(timer);
 
 let isStateEqual = (expect, actual) => compare(expect, actual) == 0;
+
+let currentTimer =
+  fun
+  | Idle(timer) => timer
+  | TimerRunningState({timer, _})
+  | TimerScheduledState({timer, _})
+  | TimerPausedState({timer, _}) => timer;

@@ -6,18 +6,16 @@ open TimerState
 
 module Effects = struct
   let stopTimer (dispose: dispose) =
-    Effect.create (fun dispatch ->
-      dispatch AppActions.TimerElapsed;
-      dispose())
+    Effect.create (fun dispatch -> dispose())
 
   let pauseTimer (dispose: dispose) =
     Effect.create (fun _ -> dispose())
 
-  let startTimer () =
+  let startTimer timer =
     Effect.create (fun dispatch ->
       let dispose = Tick.interval
-          (fun t -> AppActions.Tick(t |> Time.toFloatSeconds) |> dispatch)
-          (Time.ofFloatSeconds 0.2)
+          (fun t -> AppActions.Tick(timer, t |> Time.toFloatSeconds) |> dispatch)
+          Time.zero
       in
       AppActions.TimerStarted dispose |> dispatch
     )
@@ -33,7 +31,7 @@ module Effects = struct
 end
 
 let scheduleTimer type_ timer : (state * AppActions.t Effect.t) =
-  TimerScheduledState (TimerScheduledData.make type_ timer), Effects.startTimer ()
+  TimerScheduledState (TimerScheduledData.make type_ timer), Effects.startTimer timer
 
 let pauseTimer (clock: clock) (tr: TimerRunningData.t) : (state * AppActions.t Effect.t) =
   TimerPausedState (TimerPausedData.make ~started:tr.started ~elapsed:tr.elapsed ~paused: (clock ()) tr.timer),
@@ -48,12 +46,14 @@ let nextTick settings (tr: TimerRunningData.t) tick : (state * AppActions.t Effe
   let elapsed = tr.elapsed +. tick in
   if elapsed > Settings.getDuration settings tr.timer
   then
-    TimerElapsedState (TimerElapsedData.make tr.timer),
-    Effect.batch [
-      Effects.playTimerElapseSound settings tr.timer;
-      Effects.stopTimer tr.dispose;
-      Effects.startTimer ()
-    ]
+    let nextTimer = TimerModel.next tr.timer in
+    let (state, effect) = scheduleTimer NewTimer nextTimer in
+      state,
+      Effect.batch [
+        effect;
+        Effects.playTimerElapseSound settings tr.timer;
+        Effects.stopTimer tr.dispose;
+      ]
   else
     TimerRunningState (TimerRunningData.setElapsed elapsed tr),
     Effect.none
@@ -65,18 +65,14 @@ module StateMachine = struct
       (match state with
         | Idle defaultTimer -> scheduleTimer NewTimer defaultTimer
         | _ -> (state, Effect.none))
-      | Tick tick ->
+      | Tick (timer, tick) ->
         (match state with
-        | TimerRunningState tr -> nextTick settings tr tick
+        | TimerRunningState tr when tr.timer = timer -> nextTick settings tr tick
         | _ -> (state, Effect.none))
       | TimerStarted dispose ->
         (match state with
-        | TimerScheduledState ts -> startTimer clock dispose ts
+        | TimerScheduledState ts -> startTimer clock dispose ts   
         | _ -> (state, Effect.none))
-      | TimerElapsed ->
-         (match state with
-          | TimerElapsedState te -> TimerModel.next te.timer |> scheduleTimer NewTimer
-          | _ -> (state, Effect.none))
       | TimerResumed ->
         (match state with
         | TimerPausedState tp -> scheduleTimer (ResumedTimer tp.elapsed) tp.timer

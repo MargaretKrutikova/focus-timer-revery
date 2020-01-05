@@ -1,9 +1,10 @@
+open FocusTimer_Models;
+
 type t =
   /* timers */
   | StartTimers
-  | Tick(float)
+  | Tick((TimerModel.t, float))
   | TimerStarted(TimerState.dispose)
   | TimerPaused
   | TimerResumed
-  | TimerElapsed
   | TimerStopped;
