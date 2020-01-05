@@ -54,8 +54,10 @@ let dispatch = (store, action) =>
   };
 
 let runEffects = store => {
-  store.effects^ |> List.iter(effect => Effect.run(effect, dispatch(store)));
+  let currentEffects = store.effects^;
   store.effects := [];
+
+  currentEffects |> List.iter(effect => Effect.run(effect, dispatch(store)));
 };
 
 let getState = store => store.state^;
