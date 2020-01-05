@@ -10,14 +10,17 @@ module Styles = {
       alignItems(`Center),
       paddingVertical(`sm |> Theme.space),
       paddingHorizontal(`md |> Theme.space),
-      border(~width=1, ~color=isHovered ? Colors.lightBlue : Colors.blue),
-      borderRadius(2.),
+      backgroundColor((isHovered ? `ButtonHover : `Button) |> Theme.color),
+      border(~width=2, ~color=`ButtonBorder |> Theme.color),
+      borderRadius(2.0),
+      flexGrow(0),
+      minWidth(120),
     ];
 
   let (size, line) = Theme.fontVariant(`base);
   let text =
     Style.[
-      color(`PrimaryText |> Theme.color),
+      color(`ButtonText |> Theme.color),
       textWrap(TextWrapping.NoWrap),
       fontSize(size),
       lineHeight(line),

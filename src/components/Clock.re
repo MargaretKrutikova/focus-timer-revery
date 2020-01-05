@@ -2,20 +2,19 @@ open Revery;
 open Revery.UI;
 open FocusTimer_Models;
 
-module Interval = {
-  let make = (~time: Time.t, ()) => {
-    let text =
-      time |> Time.toFloatSeconds |> TimeInterval.make |> TimeInterval.format;
-    <View>
-      <Text
-        style=Style.[
-          color(Colors.white),
-          fontFamily("Roboto-Regular.ttf"),
-          fontSize(54),
-          marginVertical(20),
-        ]
-        text
-      />
-    </View>;
-  };
+let make = (~time: Time.t, ~currentTimer, ()) => {
+  let text =
+    time |> Time.toFloatSeconds |> TimeInterval.make |> TimeInterval.format;
+
+  <View>
+    <Text
+      style=Style.[
+        fontFamily("Roboto-Regular.ttf"),
+        fontSize(54),
+        marginVertical(20),
+        color(currentTimer |> Theme.colorFromTimer(`Text)),
+      ]
+      text
+    />
+  </View>;
 };

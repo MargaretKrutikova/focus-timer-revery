@@ -12,46 +12,47 @@ let fullTime = timer => Settings.getDuration(AppStore.settings, timer);
 let getTimeLeft = (timer, elapsed) =>
   fullTime(timer) -. elapsed |> Time.ofFloatSeconds;
 
-let toUiTimer = (state: TimerStore.state): uiTimer => {
+let toUiTimer = (state: TimerState.state): uiTimer => {
   switch (state) {
-  | TimerRunningState({timer, elapsed, _}) => {
-      timer,
-      timeLeft: getTimeLeft(timer, elapsed),
-    }
+  | TimerRunningState({timer, elapsed, _})
+  | TimerPausedState({timer, elapsed, _}) =>
+    let timeLeft = getTimeLeft(timer, elapsed);
+    {timer, timeLeft};
   | TimerScheduledState({timer, _} as ts) =>
-    let elapsed = TimerStore.TimerScheduledData.toElapsed(ts);
+    let elapsed = TimerState.TimerScheduledData.toElapsed(ts);
     {timer, timeLeft: getTimeLeft(timer, elapsed)};
-  | TimerElapsedState({timer, _}) => {
-      timer,
-      timeLeft: fullTime(timer) |> Time.ofFloatSeconds,
-    }
-  | TimerPausedState({timer, elapsed, _}) => {
-      timer,
-      timeLeft: getTimeLeft(timer, elapsed),
-    }
   | Idle(timer) => {timer, timeLeft: fullTime(timer) |> Time.ofFloatSeconds}
   };
 };
 
-let selector = state => state;
+let selector = (state: AppStore.appState) => state.timer;
 let%component make = () => {
   let%hook timerState = AppStore.useSelector(selector);
   let timerDispatch = AppStore.dispatch;
 
   let uiTimer = toUiTimer(timerState);
-  <View>
-    <AppButton
-      label="Start"
-      onClick={_ => timerDispatch(TimerStore.StartTimers)}
+  <View style=Style.[justifyContent(`Center), alignItems(`Center)]>
+    <Clock
+      time={uiTimer.timeLeft}
+      currentTimer={TimerState.currentTimer(timerState)}
     />
-    <Clock.Interval time={uiTimer.timeLeft} />
-    <AppButton
-      label="Pause"
-      onClick={_ => timerDispatch(TimerStore.TimerPaused)}
-    />
-    <AppButton
-      label="Resume"
-      onClick={_ => timerDispatch(TimerStore.TimerResumed)}
-    />
+    {switch (timerState) {
+     | TimerPausedState(_) =>
+       <AppButton
+         label="Resume"
+         onClick={_ => timerDispatch(AppActions.TimerResumed)}
+       />
+     | TimerRunningState(_)
+     | TimerScheduledState(_) =>
+       <AppButton
+         label="Pause"
+         onClick={_ => timerDispatch(AppActions.TimerPaused)}
+       />
+     | Idle(_) =>
+       <AppButton
+         label="Start"
+         onClick={_ => timerDispatch(AppActions.StartTimers)}
+       />
+     }}
   </View>;
 };
