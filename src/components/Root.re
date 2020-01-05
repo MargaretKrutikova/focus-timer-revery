@@ -7,13 +7,16 @@ let selector = (state: AppStore.appState) =>
 
 let%component make = () => {
   let%hook currentTimer = AppStore.useSelector(selector);
+
   <AppProvider>
     <View
       style=Style.[
-        alignItems(`Center),
+        position(`Absolute),
+        bottom(0),
+        top(0),
+        left(0),
+        right(0),
         justifyContent(`Center),
-        flexDirection(`Row),
-        flexGrow(1),
         backgroundColor(currentTimer |> Theme.colorFromTimer(`Bg)),
       ]>
       <Timer />
