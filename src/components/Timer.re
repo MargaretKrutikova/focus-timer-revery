@@ -31,28 +31,42 @@ let%component make = () => {
   let timerDispatch = AppStore.dispatch;
 
   let uiTimer = toUiTimer(timerState);
-  <View style=Style.[justifyContent(`Center), alignItems(`Center)]>
-    <Clock
-      time={uiTimer.timeLeft}
-      currentTimer={TimerState.currentTimer(timerState)}
-    />
-    {switch (timerState) {
-     | TimerPausedState(_) =>
-       <AppButton
-         label="Resume"
-         onClick={_ => timerDispatch(AppActions.TimerResumed)}
-       />
-     | TimerRunningState(_)
-     | TimerScheduledState(_) =>
-       <AppButton
-         label="Pause"
-         onClick={_ => timerDispatch(AppActions.TimerPaused)}
-       />
-     | Idle(_) =>
-       <AppButton
-         label="Start"
-         onClick={_ => timerDispatch(AppActions.StartTimers)}
-       />
-     }}
+  <View style=Style.[flexDirection(`Column), justifyContent(`Center)]>
+    <View style=Style.[alignSelf(`Center)]>
+      <Clock
+        time={uiTimer.timeLeft}
+        currentTimer={TimerState.currentTimer(timerState)}
+      />
+    </View>
+    <View
+      style=Style.[
+        flexDirection(`Row),
+        justifyContent(`SpaceAround),
+        flexGrow(1),
+      ]>
+      {switch (timerState) {
+       | TimerPausedState(_) =>
+         <AppButton
+           label="Resume"
+           onClick={_ => timerDispatch(AppActions.TimerResumed)}
+         />
+       | TimerRunningState(_)
+       | TimerScheduledState(_) =>
+         <AppButton
+           label="Pause"
+           onClick={_ => timerDispatch(AppActions.TimerPaused)}
+         />
+       | Idle(_) =>
+         <AppButton
+           label="Start"
+           onClick={_ => timerDispatch(AppActions.StartTimers)}
+         />
+       }}
+      <AppButton
+        label="Skip"
+        disabled={timerState |> TimerState.isIdle}
+        onClick={_ => timerDispatch(AppActions.TimerSkipped)}
+      />
+    </View>
   </View>;
 };
