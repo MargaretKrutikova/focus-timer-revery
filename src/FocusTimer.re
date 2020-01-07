@@ -5,7 +5,7 @@ open FocusTimer_Components;
 let init = app => {
   let _ = Revery.Log.listen((_, msg) => print_endline("LOG: " ++ msg));
   let win = App.createWindow(app, "Focus Timer");
-  Window.setRawSize(win, 400, 300);
+  Window.setScaledSize(win, 500, 400);
 
   let _ = UI.start(win, <Root />);
   ();
